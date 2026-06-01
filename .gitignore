@@ -1,0 +1,18 @@
+# Binaries
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+todoapp
+
+# Test binary
+*.test
+
+# Output
+*.out
+dist/
+
+# Go workspace
+go.work
+go.work.sum
