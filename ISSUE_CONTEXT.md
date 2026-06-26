@@ -1,2 +1,3 @@
-# Issue #1: ceate data model
-Create data model for user and a list of todo tasks that user can manage such as tasks, priority, timeline using go language, setup go project first using best go practices
+# Issue #3: create api
+
+Create rest api to manage users and and a list of todo tasks for user.
