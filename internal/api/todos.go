@@ -12,11 +12,13 @@ import (
 	"github.com/user/todo/internal/store"
 )
 
+// TodoHandler handles HTTP requests for todo resources scoped under a user.
 type TodoHandler struct {
 	userStore store.UserStore
 	todoStore store.TodoStore
 }
 
+// NewTodoHandler creates a TodoHandler with the given user and todo stores.
 func NewTodoHandler(us store.UserStore, ts store.TodoStore) *TodoHandler {
 	return &TodoHandler{userStore: us, todoStore: ts}
 }
@@ -29,6 +31,7 @@ type todoRequest struct {
 	DueAt       *time.Time    `json:"due_at,omitempty"`
 }
 
+// Create handles POST /users/{userID}/todos — validates the parent user exists, then creates a new todo.
 func (h *TodoHandler) Create(w http.ResponseWriter, r *http.Request) {
 	userID := chi.URLParam(r, "userID")
 	if _, err := h.userStore.GetByID(r.Context(), userID); err != nil {
@@ -67,6 +70,7 @@ func (h *TodoHandler) Create(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, http.StatusCreated, t)
 }
 
+// List handles GET /users/{userID}/todos — returns all todos for the given user, never null.
 func (h *TodoHandler) List(w http.ResponseWriter, r *http.Request) {
 	userID := chi.URLParam(r, "userID")
 	if _, err := h.userStore.GetByID(r.Context(), userID); err != nil {
@@ -88,6 +92,7 @@ func (h *TodoHandler) List(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, http.StatusOK, todos)
 }
 
+// GetByID handles GET /users/{userID}/todos/{id} — returns 404 if the todo exists but belongs to a different user.
 func (h *TodoHandler) GetByID(w http.ResponseWriter, r *http.Request) {
 	userID := chi.URLParam(r, "userID")
 	id := chi.URLParam(r, "id")
@@ -107,6 +112,7 @@ func (h *TodoHandler) GetByID(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, http.StatusOK, t)
 }
 
+// Update handles PUT /users/{userID}/todos/{id} — replaces all mutable fields; returns 404 if the todo belongs to a different user.
 func (h *TodoHandler) Update(w http.ResponseWriter, r *http.Request) {
 	userID := chi.URLParam(r, "userID")
 	id := chi.URLParam(r, "id")
@@ -153,6 +159,7 @@ func (h *TodoHandler) Update(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, http.StatusOK, existing)
 }
 
+// Delete handles DELETE /users/{userID}/todos/{id} — returns 404 if the todo belongs to a different user, 204 on success.
 func (h *TodoHandler) Delete(w http.ResponseWriter, r *http.Request) {
 	userID := chi.URLParam(r, "userID")
 	id := chi.URLParam(r, "id")
