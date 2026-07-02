@@ -12,6 +12,8 @@ import (
 	"github.com/user/todo/internal/store/memory"
 )
 
+// newTestServer creates and returns a new in-memory test HTTP server with user and todo handlers
+// registered on the router. The caller is responsible for closing the server via defer srv.Close().
 func newTestServer(t *testing.T) *httptest.Server {
 	t.Helper()
 	s := memory.New()
@@ -19,6 +21,9 @@ func newTestServer(t *testing.T) *httptest.Server {
 	return httptest.NewServer(mux)
 }
 
+// postJSON marshals body as JSON and sends an HTTP POST request to url.
+// It fails the test immediately if the request cannot be made and returns the response
+// for further inspection. The caller is responsible for closing resp.Body.
 func postJSON(t *testing.T, url string, body any) *http.Response {
 	t.Helper()
 	b, _ := json.Marshal(body)
@@ -144,6 +149,8 @@ func TestDeleteUser_OK(t *testing.T) {
 	}
 }
 
+// createUser is a test helper that creates a default user ("testuser") via the /users endpoint
+// on the given test server and returns the newly created user's ID.
 func createUser(t *testing.T, srv *httptest.Server) string {
 	t.Helper()
 	resp := postJSON(t, srv.URL+"/users", map[string]string{
